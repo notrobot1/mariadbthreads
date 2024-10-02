@@ -22,7 +22,7 @@ import (
 // To open File
 // Add the file to ipfs and public ipns
 // Notifi about the new record
-func PublicDB(ctx context.Context, dbName string, p *Peer, privKey crypto.PrivKey, ps *pubsub.PubSub) error {
+func PublicDB(ctx context.Context, dbName string, p *Peer, privKey crypto.PrivKey) error {
 
 	file, err := os.Open(dbName)
 	if err != nil {
@@ -48,11 +48,7 @@ func PublicDB(ctx context.Context, dbName string, p *Peer, privKey crypto.PrivKe
 		return err
 	}
 	fmt.Println(ipnsPath.String())
-	//Notify participants about the DB
-	err = ps.Publish("hh", []byte(ipnsPath.String()))
-	if err != nil {
-		return err
-	}
+	
 	return nil
 }
 
