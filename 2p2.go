@@ -1,16 +1,18 @@
 package mariadbthreads
 
 import (
-	"context"
+		"context"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
 	ipns "github.com/ipfs/boxo/ipns"
+	"github.com/ipfs/go-cid"
 	"github.com/ipfs/go-datastore"
 	"github.com/libp2p/go-libp2p"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
+	"github.com/libp2p/go-libp2p-kad-dht/dual"
 	dualdht "github.com/libp2p/go-libp2p-kad-dht/dual"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 
@@ -169,3 +171,20 @@ func Subscribe(ctx context.Context, h host.Host, topic string) (*pubsub.Subscrip
 	return sub, ps
 
 }
+
+
+func Discovery(ctx context.Context, dht *dual.DHT, topic string) ([]peer.AddrInfo, error) {
+
+	provideCid := cid.NewCidV1(cid.Raw, []byte(topic))
+	if err := dht.Provide(ctx, provideCid, true); err != nil {
+		return nil, err
+	}
+
+	pArr, err := dht.LAN.FindProviders(ctx, provideCid)
+	if err != nil {
+		return nil, err
+	}
+	return pArr, nil
+
+}
+
